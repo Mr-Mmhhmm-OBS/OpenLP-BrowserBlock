@@ -4,101 +4,35 @@
    <meta charset="utf-8" />
    <title>OpenLP Lower3rd</title>
    <style>
-      body {
-         margin: 0;
-      }
-
-      body > div {
-         position: absolute;
-         margin: auto 0;
+      html, body {
          width: 100%;
-         min-height: 100px;
-         font-family: Arial, Helvetica, sans-serif;
-         font-weight: bold;
-         text-align: center;
+         height: 100%;
+         display: flex;
+         flex-direction: row;
+         overflow: hidden;
+         margin: 0;
       }
 
       #text {
-         color: white;
+         font-family: Arial, Helvetica, sans-serif;
+         font-weight: normal;
+         place-self: flex-end;
+         margin-left: auto;
+         margin-right: auto;
       }
 
-      #text p{
-         line-height: 1em;
-         padding: 0;
-         margin: 0;
-      }
+         #text p {
+            line-height: 1em;
+            padding: 0 1em;
+            margin: auto;
+            color: white;
+            background-color: #000a;
+            text-align: center;
+         }
    </style>
+   <script type="text/javascript" src="/stage/lower-third/stage.js"></script>
 </head>
 <body>
-   <div>
-      <span id="text">
-      </span>
-   </div>
-
-   <script type="text/javascript">
-      window.OpenLP = {
-         websocket_port: 4317,
-
-         connect: function () {
-            const host = window.location.hostname;
-            ws = new WebSocket(`ws://${host}:${OpenLP.websocket_port}`);
-            ws.onmessage = (event) => {
-               const reader = new FileReader();
-               reader.onload = () => {
-                  data = JSON.parse(reader.result.toString()).results;
-
-                  if (OpenLP.currentItem != data.item || OpenLP.currentService != data.service) {
-                     OpenLP.currentItem = data.item;
-                     OpenLP.currentService = data.service;
-                     OpenLP.loadSlides();
-                  }
-                  else if (OpenLP.currentSlide != data.slide) {
-                     OpenLP.currentSlide = parseInt(data.slide, 10);
-                     OpenLP.updateSlide();
-                  }
-               };
-
-               reader.readAsText(event.data);
-            };
-         },
-
-         loadSlides: function () {
-            fetch('/api/v2/controller/live-items?_=' + Date.now())
-               .then(function (response) {
-                  return response.json();
-               })
-               .then(function (data) {
-                  OpenLP.currentSlides = data.slides;
-                  OpenLP.currentSlide = 0;
-
-                  OpenLP.currentSlides.forEach(function (slide, idx) {
-                     if (slide["selected"])
-                        OpenLP.currentSlide = idx;
-                  });
-
-                  OpenLP.updateSlide();
-               });
-         },
-
-         updateSlide: function () {
-            let content = '';
-            let lines = OpenLP.currentSlides[OpenLP.currentSlide].text.split("\n");
-
-            lines.forEach(function (line, idx) {
-               content += '<p>' + line + '</p>';
-            });
-
-            document.getElementById('text').innerHTML = content;
-         },
-
-         alignToCenter: function () {
-            document.getElementById('text').setAttribute('transform', 'translate(' + ((window.innerWidth / 2) + 7) + ')');
-         }
-      }
-
-      window.onresize = OpenLP.alignToCenter;
-      OpenLP.alignToCenter();
-      OpenLP.connect();
-   </script>
+   <div id="text"></div>
 </body>
 </html>
