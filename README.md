@@ -1,12 +1,12 @@
 # OpenLP-LowerThird
 
-Valid URLS:
-/stage/lower-third
-/stage/lower-third?mode=lyrics
-/stage/lower-third?mode=lyrics&show_images=false
+<b>Valid URLS:</b></br>
+/stage/lower-third</br>
+/stage/lower-third?mode=lyrics</br>
+/stage/lower-third?mode=lyrics&show_images=false</br>
 
 /stage/lower-third?mode=title
 
 /stage/lower-third?mode=footer
 
-To alter the appearance either edit the stage.html style or add custom css to the OBS Browser
+<b>To alter the appearance</b> either edit the stage.html style or add custom css to the OBS Browser
