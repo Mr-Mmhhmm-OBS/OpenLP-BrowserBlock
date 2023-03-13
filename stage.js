@@ -11,7 +11,7 @@ window.OpenLP = {
             OpenLP.mode = OpenLP.modes.lyrics;
         }
         if (OpenLP.mode == OpenLP.modes.lyrics) {
-            OpenLP.show_images = params.get("show_images");
+            OpenLP.show_images = params.has("show_images");
         }
 
         const host = window.location.hostname;
