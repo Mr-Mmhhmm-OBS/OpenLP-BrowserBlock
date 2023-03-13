@@ -1,6 +1,8 @@
 # OpenLP-LowerThird
 
-<h2>Valid URLS:</h2></br>
+<b>To alter the appearance</b> either edit the stage.html style or add custom css to the OBS Browser
+
+<h3>Valid URLS:</h3></br>
 <h4>Lyrics</h4>
 /stage/lower-third</br>
 /stage/lower-third?mode=lyrics</br>
@@ -13,4 +15,3 @@
 <h4>Footers:</h4>
 /stage/lower-third?mode=footer
 
-<b>To alter the appearance</b> either edit the stage.html style or add custom css to the OBS Browser
