@@ -20,9 +20,6 @@ window.OpenLP = {
             const reader = new FileReader();
             reader.onload = () => {
                 data = JSON.parse(reader.result.toString()).results;
-
-                console.log(data);
-
                 if (data.blank || data.theme || data.display) {
                     switch (OpenLP.mode) {
                         case OpenLP.modes.lyrics:
@@ -60,8 +57,6 @@ window.OpenLP = {
                 return response.json();
             })
             .then(function (data) {
-                console.log(data);
-
                 switch (OpenLP.mode) {
                     case OpenLP.modes.lyrics:
                         OpenLP.currentSlides = data.slides;
