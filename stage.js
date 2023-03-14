@@ -1,7 +1,11 @@
+$(document).ready(function () {
+    OpenLP.connect();
+});
+
 window.OpenLP = {
+    visible: false,
     mode: "lyrics",
     modes: { lyrics: "lyrics", title: "title", footer: "footer" },
-    show_images: true,
     websocket_port: 4317,
 
     connect: function () {
@@ -14,6 +18,13 @@ window.OpenLP = {
             OpenLP.show_images = params.has("show_images");
         }
 
+        if (params.has("show_types")) {
+            OpenLP.show_types = params.get("show_types").split(",");
+        }
+        else {
+            OpenLP.show_types = ["songs", "bibles"];
+        }
+
         const host = window.location.hostname;
         ws = new WebSocket(`ws://${host}:${OpenLP.websocket_port}`);
         ws.onmessage = (event) => {
@@ -21,25 +32,17 @@ window.OpenLP = {
             reader.onload = () => {
                 data = JSON.parse(reader.result.toString()).results;
                 if (data.blank || data.theme || data.display) {
-                    switch (OpenLP.mode) {
-                        case OpenLP.modes.lyrics:
-                            OpenLP.currentSlide = -1;
-                            break;
-                        case OpenLP.modes.title:
-                            OpenLP.currentTitle = "";
-                            break;
-                        case OpenLP.modes.footer:
-                            OpenLP.currentFooter = [];
-                            break;
-                    }
+                    OpenLP.visible = false;
                     OpenLP.update();
                 }
-                else if (OpenLP.currentItem != data.item || OpenLP.currentService != data.service) {
+                else if (OpenLP.currentItem != data.item || OpenLP.currentService != data.service || OpenLP.visible == false) {
+                    OpenLP.visible = true;
                     OpenLP.currentItem = data.item;
                     OpenLP.currentService = data.service;
                     OpenLP.load();
                 }
                 else if (OpenLP.currentSlide != data.slide) {
+                    OpenLP.visible = true;
                     if (OpenLP.mode == OpenLP.modes.lyrics) {
                         OpenLP.currentSlide = parseInt(data.slide, 10);
                         OpenLP.update();
@@ -60,18 +63,19 @@ window.OpenLP = {
                 switch (OpenLP.mode) {
                     case OpenLP.modes.lyrics:
                         OpenLP.currentSlides = data.slides;
-                        OpenLP.currentSlide = 0;
-
-                        OpenLP.currentSlides.forEach(function (slide, idx) {
-                            if (slide["selected"])
-                                OpenLP.currentSlide = idx;
-                        });
+                        OpenLP.currentSlide = -1;
+                        if (OpenLP.currentSlides && OpenLP.show_types.includes(data.name)) {
+                            OpenLP.currentSlides.forEach(function (slide, idx) {
+                                if (slide["selected"])
+                                    OpenLP.currentSlide = idx;
+                            });
+                        }
                         break;
                     case OpenLP.modes.title:
-                        OpenLP.currentTitle = data.title;
+                        OpenLP.currentTitle = (OpenLP.show_types.includes(data.name) ? data.title : "");
                         break;
                     case OpenLP.modes.footer:
-                        OpenLP.currentFooter = data.footer;
+                        OpenLP.currentFooter = (OpenLP.show_types.includes(data.name) ? data.footer : "");
                         break;
                 }
                 OpenLP.update();
@@ -79,35 +83,63 @@ window.OpenLP = {
     },
 
     update: function () {
-        let content = '';
-        switch (OpenLP.mode) {
-            case OpenLP.modes.lyrics:
-                if (OpenLP.currentSlide > -1) {
-                    if (OpenLP.currentSlides[OpenLP.currentSlide].img) {
-                        if (OpenLP.show_images) {
-                            content = "<img src='" + OpenLP.currentSlides[OpenLP.currentSlide].img + "'>";
+        var $content = null;
+        if (OpenLP.visible == true) {
+            switch (OpenLP.mode) {
+                case OpenLP.modes.lyrics:
+                    if (OpenLP.currentSlide > -1) {
+                        if (OpenLP.currentSlides[OpenLP.currentSlide].img) {
+                            if (OpenLP.show_images) {
+                                $content = $("<section />").append(
+                                    $("<div />").append(
+                                        $("<img/>", { src: OpenLP.currentSlides[OpenLP.currentSlide].img })
+                                    )
+                                );
+                            }
+                        } else {
+                            var $content = $("<section />").css({ display: "none" }).fadeIn({ queue: true, duration: 1000 });
+                            var $div = $('<div />');
+                            $content.append($div);
+                            let lines = OpenLP.currentSlides[OpenLP.currentSlide].text.split("\n");
+                            lines.forEach(function (line, idx) {
+                                $div.append(
+                                    $('<p />').text(line)
+                                );
+                            });
                         }
-                    } else {
-                        let lines = OpenLP.currentSlides[OpenLP.currentSlide].text.split("\n");
-                        lines.forEach(function (line, idx) {
-                            content += '<p>' + line + '</p>';
-                        });
                     }
-                }
-                break;
-            case OpenLP.modes.title:
-                content = OpenLP.currentTitle;
-                break;
-            case OpenLP.modes.footer:
-                let lines = OpenLP.currentFooter;
-                lines.forEach(function (line, idx) {
-                    content += '<p>' + line + '</p>';
-                });
-                break;
+                    break;
+                case OpenLP.modes.title:
+                    $content = $("<h1/>").text(OpenLP.currentTitle).css({ display: "none" }).fadeIn({ queue: true });
+                    break;
+                case OpenLP.modes.footer:
+                    var $content = $('<footer />').css({ display: "none" }).fadeIn({ queue: true });;
+                    let lines = OpenLP.currentFooter;
+                    lines.forEach(function (line, idx) {
+                        $content.append(
+                            $('<p />').text(line)
+                        );
+                    });
+                    break;
+            }
         }
 
-        document.getElementById('text').innerHTML = content;
+        
+        var $old = $("body > section, body footer, body h1")
+        if ($old.length) {
+            $old.fadeOut({
+                queue: true,
+                always: function () {
+                    $(this).remove();
+                    if ($content) {
+                        $("html body").append($content);
+                    }
+                }
+            });
+        } else {
+            if ($content) {
+                $("html body").append($content);
+            }
+        }
     }
 }
-
-OpenLP.connect();
