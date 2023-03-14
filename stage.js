@@ -114,7 +114,6 @@ window.OpenLP = {
                     break;
                 case OpenLP.modes.footer:
                     var $content = $('<footer />').css({ display: "none" }).fadeIn({ queue: true });
-                    console.log(OpenLP.currentFooter);
                     OpenLP.currentFooter.forEach(function (line, idx) {
                         $content.append(
                             $('<p />').text(line)
