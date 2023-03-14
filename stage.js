@@ -75,7 +75,7 @@ window.OpenLP = {
                         OpenLP.currentTitle = (OpenLP.show_types.includes(data.name) ? data.title : "");
                         break;
                     case OpenLP.modes.footer:
-                        OpenLP.currentFooter = (OpenLP.show_types.includes(data.name) ? data.footer : "");
+                        OpenLP.currentFooter = (OpenLP.show_types.includes(data.name) ? data.footer : []);
                         break;
                 }
                 OpenLP.update();
@@ -113,9 +113,9 @@ window.OpenLP = {
                     $content = $("<h1/>").text(OpenLP.currentTitle).css({ display: "none" }).fadeIn({ queue: true });
                     break;
                 case OpenLP.modes.footer:
-                    var $content = $('<footer />').css({ display: "none" }).fadeIn({ queue: true });;
-                    let lines = OpenLP.currentFooter;
-                    lines.forEach(function (line, idx) {
+                    var $content = $('<footer />').css({ display: "none" }).fadeIn({ queue: true });
+                    console.log(OpenLP.currentFooter);
+                    OpenLP.currentFooter.forEach(function (line, idx) {
                         $content.append(
                             $('<p />').text(line)
                         );
