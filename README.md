@@ -1,4 +1,4 @@
-# OpenLP-LowerThird
+# OpenLP-BrowserBlock
 <b>To alter the appearance</b> either edit the stage.html style or add custom css to the OBS Browser
 <h3>Valid URLS:</h3>
 <h4>Lyrics</h4>
