@@ -97,7 +97,7 @@ window.OpenLP = {
                                 );
                             }
                         } else {
-                            var $content = $("<section />").css({ display: "none" }).fadeIn({ queue: true, duration: 1000 });
+                            var $content = $("<section />").css({ display: "none" }).fadeIn({ queue: false, duration: 1000 });
                             var $div = $('<div />');
                             $content.append($div);
                             let lines = OpenLP.currentSlides[OpenLP.currentSlide].text.split("\n");
@@ -110,10 +110,10 @@ window.OpenLP = {
                     }
                     break;
                 case OpenLP.modes.title:
-                    $content = $("<h1/>").text(OpenLP.currentTitle).css({ display: "none" }).fadeIn({ queue: true });
+                    $content = $("<h1/>").text(OpenLP.currentTitle).css({ display: "none" }).fadeIn({ queue: false, duration: 1000 });
                     break;
                 case OpenLP.modes.footer:
-                    var $content = $('<footer />').css({ display: "none" }).fadeIn({ queue: true });
+                    var $content = $('<footer />').css({ display: "none" }).fadeIn({ queue: false, duration:1000 });
                     OpenLP.currentFooter.forEach(function (line, idx) {
                         $content.append(
                             $('<p />').text(line)
@@ -124,21 +124,17 @@ window.OpenLP = {
         }
 
         
-        var $old = $("body > section, body footer, body h1")
+        var $old = $("body > section, body > footer, body > h1")
         if ($old.length) {
             $old.fadeOut({
                 queue: true,
                 always: function () {
                     $(this).remove();
-                    if ($content) {
-                        $("html body").append($content);
-                    }
                 }
             });
-        } else {
-            if ($content) {
-                $("html body").append($content);
-            }
-        }
-    }
+		}
+		if ($content) {
+			$("html body").append($content);
+		}
+	}
 }
